@@ -6,7 +6,7 @@
 #include <string>
 #include <Windows.h>
 
-#pragma warning(disable:4996)
+//#pragma warning(disable:4996)
 
 using namespace std;;
 
@@ -34,7 +34,7 @@ void CParameter::GetIPList()
 	{
 		cout << "Winsock load failed: " << GetLastError() << endl;
 	}
-	struct hostent *phostinfo = gethostbyname("");
+	hostent *phostinfo = gethostbyname("");
 
 	LNode *p1, *p2;
 	p2 = ip_addr_list;

@@ -1,7 +1,7 @@
 #pragma once
 
 //
-//	该类封装一系列应用启动所需的准备方法
+//	该类封装一系列应用启动所需的准备工作
 //	
 
 class CParameter
@@ -19,14 +19,16 @@ private:
 		struct _LNode *next;
 	}LNode;
 
+private:
 	void Init();
 
 
 public:
 	LNode *ip_addr_list;
 
+public:
 	CParameter();
 	~CParameter();
-	void GetIPList();
+	void GetIPList();//返回一个链表，存储的是本地所有网卡的IP地址
 };
 

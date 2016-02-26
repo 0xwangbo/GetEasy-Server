@@ -14,16 +14,14 @@ class CWlan
 //protected:
 //	DECLARE_MESSAGE_MAP()
 
-public:
-	CWlan();
-	~CWlan();
-
 private:
 	bool allow;
 	bool start;
 	HANDLE hClient;
 
 public:
+	CWlan();
+	~CWlan();
 	int Init(void);
 	int AllowHostedNetWork(void);
 	int DisallowHostedNetWork(void);
