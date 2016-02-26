@@ -4,6 +4,8 @@
 #include "afxinet.h"
 #include "string.h"
 #include "stdlib.h"
+#include "afxwin.h"
+#include "afxcmn.h"
 
 /*********************/
 /*  extern data      */

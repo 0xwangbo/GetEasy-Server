@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "Server.h"
 
+
 //ADD
 //#include "ftpSrver.h"
 
@@ -47,8 +48,8 @@ UINT ServerThread(LPVOID lpParameter)
    // 创建监听socket ：sListen
    if ( ( server->sListen = WSASocket(AF_INET,SOCK_STREAM,0,NULL,0,WSA_FLAG_OVERLAPPED) ) == INVALID_SOCKET ) 
    {
-	   sprintf( errorMsg,"ERROR：Failed to get a socket %d.POS:ServerThread()\n", WSAGetLastError() );
-	   AfxMessageBox( errorMsg,MB_OK,0 );
+	   sprintf_s( errorMsg,"ERROR：Failed to get a socket %d.POS:ServerThread()\n", WSAGetLastError() );
+	   ////AfxMessageBox( errorMsg,MB_OK,0 );
 	   WSACleanup();
        return 0;
    }
@@ -63,32 +64,32 @@ UINT ServerThread(LPVOID lpParameter)
    //绑定监听端口sListen，指定通信对象
    if ( bind(server->sListen, (PSOCKADDR)&addrInfo, sizeof(addrInfo) ) == SOCKET_ERROR )
    {
-	   sprintf( errorMsg,"ERROR：bind() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
-	   AfxMessageBox( errorMsg,MB_OK,0 );
+	   sprintf_s( errorMsg,"ERROR：bind() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
+	   //AfxMessageBox( errorMsg,MB_OK,0 );
        return 0;
    }
 
    //设置sListen到等待连接状态
    if( listen( server->sListen, SOMAXCONN ) )
    {
-	   sprintf( errorMsg,"ERROR：listen() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
-	   AfxMessageBox( errorMsg,MB_OK,0 );
+	   sprintf_s( errorMsg,"ERROR：listen() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
+	   //AfxMessageBox( errorMsg,MB_OK,0 );
        return 0;
    }
 
    //创建会话socket
    if( ( server->sDialog = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED) ) == INVALID_SOCKET ) 
    {
-	   sprintf( errorMsg,"ERROR：Failed to get a dialog socket %d.POS:ServerThread()\n", WSAGetLastError() );
-	   AfxMessageBox( errorMsg,MB_OK,0 );
+	   sprintf_s( errorMsg,"ERROR：Failed to get a dialog socket %d.POS:ServerThread()\n", WSAGetLastError() );
+	   //AfxMessageBox( errorMsg,MB_OK,0 );
 	   return 0;
    }
 
    //创建第一个手动重置对象
    if ( ( g_EventArray[0] = WSACreateEvent() ) == WSA_INVALID_EVENT )
    {
-	   sprintf( errorMsg,"ERROR：WSACreateEvent() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
-	   AfxMessageBox( errorMsg,MB_OK,0 );
+	   sprintf_s( errorMsg,"ERROR：WSACreateEvent() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
+	   //AfxMessageBox( errorMsg,MB_OK,0 );
 	   return 0;
    }
 
@@ -124,8 +125,8 @@ UINT ServerThread(LPVOID lpParameter)
       //创建一个新的SOCKET_INF结构处理接受的数据socket
       if( (g_SocketArray[g_dwTotalEventAmount] = (LPSOCKET_INF)GlobalAlloc(GPTR,sizeof(SOCKET_INF))) == NULL )
       {
-		  sprintf( errorMsg,"ERROR：GlobalAlloc() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
-		  AfxMessageBox( errorMsg,MB_OK,0 );
+		  sprintf_s( errorMsg,"ERROR：GlobalAlloc() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
+		  //AfxMessageBox( errorMsg,MB_OK,0 );
 		  return 0;
       } 
 
@@ -153,8 +154,8 @@ UINT ServerThread(LPVOID lpParameter)
       if ( ( g_SocketArray[g_dwTotalEventAmount]->wsaOverLapped.hEvent = 
 		     g_EventArray[g_dwTotalEventAmount] = WSACreateEvent() ) == WSA_INVALID_EVENT )
       {
-		  sprintf( errorMsg,"WSACreateEvent() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
-		  AfxMessageBox( errorMsg,MB_OK,0 );
+		  sprintf_s( errorMsg,"WSACreateEvent() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
+		  //AfxMessageBox( errorMsg,MB_OK,0 );
 		  return 0;
       }
 
@@ -177,8 +178,8 @@ UINT ServerThread(LPVOID lpParameter)
 			 WSACloseEvent( g_EventArray[g_dwTotalEventAmount] );
 
 			 //弹出提示消息
-			 sprintf( errorMsg,"ERROR：WSARecv() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
-			 AfxMessageBox( errorMsg,MB_OK,0 );
+			 sprintf_s( errorMsg,"ERROR：WSARecv() failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
+			 //AfxMessageBox( errorMsg,MB_OK,0 );
 
 			 return 0;
          }
@@ -193,8 +194,8 @@ UINT ServerThread(LPVOID lpParameter)
 	  //使第一个事件有信号，使工作者线程处理其他的事件
       if ( WSASetEvent( g_EventArray[0] ) == FALSE )
       {
-		  sprintf( errorMsg,"ERROR：WSASetEvent failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
-		  AfxMessageBox( errorMsg,MB_OK,0 );
+		  sprintf_s( errorMsg,"ERROR：WSASetEvent failed with error %d.POS:ServerThread()\n", WSAGetLastError() );
+		  //AfxMessageBox( errorMsg,MB_OK,0 );
 		  return 0;
       }
    }
@@ -222,8 +223,8 @@ UINT ProcessThreadIO( LPVOID lpParameter )
 	   //调用重叠操作（WSARecv()、 WSARecvFrom()、WSASend()、WSASendTo() 或 WSAIoctl()），等待事件通知
       if ( (g_index = WSAWaitForMultipleEvents(g_dwTotalEventAmount, g_EventArray, FALSE, WSA_INFINITE, FALSE)) == WSA_WAIT_FAILED )
       {
-		  sprintf( errorMsg, "Error WSAWaitForMultipleEvents() failed with error:%d\n",WSAGetLastError() );
-		  AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
+		  sprintf_s( errorMsg, "Error WSAWaitForMultipleEvents() failed with error:%d\n",WSAGetLastError() );
+		  //AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
 		  return 0;
       }
       
@@ -309,8 +310,8 @@ UINT ProcessThreadIO( LPVOID lpParameter )
 					 //设置ftp根目录 \ Nonzero if successful; otherwise 0
 					 if( SetCurrentDirectory( pSocketInfo->userCurrentDir )==0 )
 					 {
-						 sprintf( errorMsg,"ERROR：POS:ServerThread()\nSetCurrentDirectory() failed with error: %d.", GetLastError() );
-						 AfxMessageBox( errorMsg,MB_OK|MB_ICONERROR );
+						 sprintf_s( errorMsg,"ERROR：POS:ServerThread()\nSetCurrentDirectory() failed with error: %d.", GetLastError() );
+						 //AfxMessageBox( errorMsg,MB_OK|MB_ICONERROR );
 					 }
 				 }
 			 }
@@ -373,7 +374,7 @@ BOOL CServer::SendWelcomeMsg( SOCKET s )
 	char* welcomeInfo = "Welcome to use GetEasy-Server...\nServer ready..\r\n";
 
 	if( send( s, welcomeInfo, (int)strlen(welcomeInfo), 0 )==SOCKET_ERROR ){
-		AfxMessageBox(_T("Failed in sending welcome msg. POS:CServer::SendWelcomeMsg"));
+		//AfxMessageBox(_T("Failed in sending welcome msg. POS:CServer::SendWelcomeMsg"));
 		return FALSE;
 	}
 	return TRUE;
@@ -392,13 +393,13 @@ int CServer::Login( LPSOCKET_INF socketInfo )
 	//获取用户名
 	if( strstr( strupr(socketInfo->buffRecv),"USER" )||strstr( strlwr(socketInfo->buffRecv),"user" ) )
 	{
-		sprintf( username, "%s", socketInfo->buffRecv+strlen("user")+1 );
+		sprintf_s( username, "%s", socketInfo->buffRecv+strlen("user")+1 );
 		strtok( username, "\r\n" );
 		//ACK
-		sprintf( socketInfo->buffSend, "%s", "331 User name ok,need password.\r\n" );
+		sprintf_s( socketInfo->buffSend, "%s", "331 User name ok,need password.\r\n" );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("Failed in sending ACK. POS:CServer::Login()") );
+			//AfxMessageBox( _T("Failed in sending ACK. POS:CServer::Login()") );
 			return -1;
 		}
 		//successed in getting username
@@ -407,13 +408,13 @@ int CServer::Login( LPSOCKET_INF socketInfo )
 	//获取用户登录密码
 	if( strstr( strupr(socketInfo->buffRecv),"PASS" )||strstr( strlwr(socketInfo->buffRecv),"pass") )
 	{
-		sprintf( password,"%s",socketInfo->buffRecv+strlen("pass")+1 );
+		sprintf_s( password,"%s",socketInfo->buffRecv+strlen("pass")+1 );
 		strtok( password, "\r\n" );
 		//判断用户名密码正确性
 		int size = (int)m_RegisteredAccount.GetCount();
 		BOOL isAccountExisted = FALSE;
 		CString user = (CString)username;
-		//AfxMessageBox(user);
+		////AfxMessageBox(user);
 		CString pwd = (CString)password;
 		for( int i=0 ; i<size ; i++ )
 		{
@@ -431,17 +432,17 @@ int CServer::Login( LPSOCKET_INF socketInfo )
 		//账户存在与否相应的反馈信息
 		if( isAccountExisted )
 		{
-			sprintf( socketInfo->buffSend,"230 User:%s logged in.proceed.\r\n",username );
+			sprintf_s( socketInfo->buffSend,"230 User:%s logged in.proceed.\r\n",username );
 			loginResult = LOGGED_IN;
 		}
 		else{
-			sprintf( socketInfo->buffSend,"530 User:%s cannot logged in, Wrong username or password.Try again.\r\n",username );
+			sprintf_s( socketInfo->buffSend,"530 User:%s cannot logged in, Wrong username or password.Try again.\r\n",username );
 			loginResult = LOGIN_FAILED;
 		}
 		//发送ACK
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("Failed in sending ACK. POS:CServer::Login()") );
+			//AfxMessageBox( _T("Failed in sending ACK. POS:CServer::Login()") );
 			return -1;
 		}
 	}
@@ -473,8 +474,8 @@ int CServer::SendACK( LPSOCKET_INF socketInfo )
 	{
         if ( WSAGetLastError() != ERROR_IO_PENDING )
 		{
-			sprintf( errorMsg,"WSASend() failed with error :%d.POS:CServer::SendACK()\n", WSAGetLastError() );
-			AfxMessageBox( errorMsg );
+			sprintf_s( errorMsg,"WSASend() failed with error :%d.POS:CServer::SendACK()\n", WSAGetLastError() );
+			//AfxMessageBox( errorMsg );
 			return -1;
         }
     }
@@ -506,8 +507,8 @@ int CServer::RecvRequest( LPSOCKET_INF socketInfo )
 	{
 		if ( WSAGetLastError() != ERROR_IO_PENDING )
 		{
-			sprintf( errorMsg,"WSARecv() failed with error: %d.POS:CServer::RecvRequest()\n", WSAGetLastError() );
-			AfxMessageBox( errorMsg,MB_OK,MB_ICONERROR );
+			sprintf_s( errorMsg,"WSARecv() failed with error: %d.POS:CServer::RecvRequest()\n", WSAGetLastError() );
+			//AfxMessageBox( errorMsg,MB_OK,MB_ICONERROR );
 		    return -1;
 		}
 	}
@@ -578,15 +579,15 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		//将','分隔的IP地址形式分解为一个DWORD形IP(32为Internet主机地址)0(dwIpAddr)和一个WORD（16为TCP端口地址）形端口(wPort)
 		if( ConvertCommaAddrToDotAddr( socketInfo->buffRecv+strlen("PORT")+1,&dwIpAddr,&wPort) == -1 )
 		{
-			AfxMessageBox( _T("Failed in ConvertCommaAddrToDotAddr().CMD:PORT") );
+			//AfxMessageBox( _T("Failed in ConvertCommaAddrToDotAddr().CMD:PORT") );
 			return -1;
 		}
 
 		//发送消息响应客户端
-		sprintf( socketInfo->buffSend,"%s","200 PORT Command successful.\r\n" );
+		sprintf_s( socketInfo->buffSend,"%s","200 PORT Command successful.\r\n" );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:PORT"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:PORT"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -602,7 +603,7 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 	{
 		if( DataConnect( sAccept, htonl(INADDR_ANY), PORT_BIND, MODE_PASV ) == -1 )  //0==成功，-1==失败
 		{
-			AfxMessageBox( "DataConnect() failed.CMD:PASV",MB_OK|MB_ICONERROR );
+			//AfxMessageBox( "DataConnect() failed.CMD:PASV",MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -610,17 +611,17 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		char szCommaAddress[40];
 		if( ConvertDotAddrToCommaAddr( GetLocalAddress(),PORT_BIND,szCommaAddress )==-1 )
 		{
-			AfxMessageBox( _T("Failed in ConvertCommaAddrToDotAddr().CMD:PASV") );
+			//AfxMessageBox( _T("Failed in ConvertCommaAddrToDotAddr().CMD:PASV") );
 			return -1;
 		}
 
 		//设置ACK
-		sprintf( socketInfo->buffSend,"227 Entering Passive Mode (%s).\r\n",szCommaAddress );
+		sprintf_s( socketInfo->buffSend,"227 Entering Passive Mode (%s).\r\n",szCommaAddress );
 
 		//发送ACK
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:PASV"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:PASV"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -641,7 +642,7 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 
 		if( !isPasvMode )	//主动传输
 		{
-			sprintf( socketInfo->buffSend,"%s/bin/ls.\r\n",szOpeningAMode );
+			sprintf_s( socketInfo->buffSend,"%s/bin/ls.\r\n",szOpeningAMode );
 		}
 		else				//被动传输
 		{
@@ -651,7 +652,7 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		//send ACK
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:NLST/LIST"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:NLST/LIST"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -666,12 +667,12 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		{
 			if( DataConnect( sAccept,dwIpAddr,wPort,MODE_PORT ) == -1 )
 			{
-				AfxMessageBox( _T("DataConnect() failed.CMD:NLST/LIST"),MB_OK|MB_ICONERROR );
+				//AfxMessageBox( _T("DataConnect() failed.CMD:NLST/LIST"),MB_OK|MB_ICONERROR );
 				return -1;
 			}
 			if( DataSend( sAccept, buffer,nStrLen ) == -1 )
 			{
-				AfxMessageBox( _T("DataSend() failed.CMD:NLST/LIST"),MB_OK|MB_ICONERROR );
+				//AfxMessageBox( _T("DataSend() failed.CMD:NLST/LIST"),MB_OK|MB_ICONERROR );
 				return -1;
 			}
 
@@ -685,10 +686,10 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		}
 
 		//send ACK
-		sprintf( socketInfo->buffSend,"%s","226 Transfer complete.\r\n" );
+		sprintf_s( socketInfo->buffSend,"%s","226 Transfer complete.\r\n" );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:NLST/LIST"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:NLST/LIST"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -709,17 +710,17 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		int nFileSize = CombindFileNameSize( cmdtail,fileNameSize ); //返回获取文件大小，求文件名及大小信息保存在fileNameSize中
 
 		//ACK
-		sprintf( socketInfo->buffSend,"%s%s.\r\n",szOpeningAMode,fileNameSize );
+		sprintf_s( socketInfo->buffSend,"%s%s.\r\n",szOpeningAMode,fileNameSize );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:RETR"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:RETR"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
 		char* buffer = new char[nFileSize];
 		if( buffer == NULL )
 		{
-			AfxMessageBox( _T("分配缓存失败!\n") );
+			//AfxMessageBox( _T("分配缓存失败!\n") );
 			return -1;
 		}
 
@@ -755,10 +756,10 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		}
 
 		//ACK
-		sprintf( socketInfo->buffSend,"%s","226 Transfer complete.\r\n" );
+		sprintf_s( socketInfo->buffSend,"%s","226 Transfer complete.\r\n" );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:RETR"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:RETR"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 				
@@ -780,10 +781,10 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		}
 
 		//ACK
-		sprintf( socketInfo->buffSend,"%s%s.\r\n",szOpeningAMode,cmdtail );
+		sprintf_s( socketInfo->buffSend,"%s%s.\r\n",szOpeningAMode,cmdtail );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:STOR"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:STOR"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -805,10 +806,10 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		}
 		
 		//ACK
-		sprintf( socketInfo->buffSend,"%s","226 Transfer complete.\r\n" );
+		sprintf_s( socketInfo->buffSend,"%s","226 Transfer complete.\r\n" );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:STOR"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:STOR"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 				
@@ -820,10 +821,10 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 	if( strstr( command,"QUIT" ) )
 	{
 		//ACK
-		sprintf( socketInfo->buffSend,"%s","221 Goodbye.\r\n" );
+		sprintf_s( socketInfo->buffSend,"%s","221 Goodbye.\r\n" );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:QUIT"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:QUIT"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 		
@@ -842,10 +843,10 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		HostToNet( tempStr );
 
 		//发送ACK
-		sprintf( socketInfo->buffSend,"257 \"%s\" is current directory.\r\n",tempStr );
+		sprintf_s( socketInfo->buffSend,"257 \"%s\" is current directory.\r\n",tempStr );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:XPWD/PWD"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:XPWD/PWD"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -869,7 +870,7 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		if( SetCurrentDirectory( szSetDir )==0 )
 		{
 			//set ACK
-			sprintf( socketInfo->buffSend,"550 '%s' No such file or Directory.\r\n",szSetDir );
+			sprintf_s( socketInfo->buffSend,"550 '%s' No such file or Directory.\r\n",szSetDir );
 
 			//记录处理结果
 			operationResult = CANNOT_FIND;
@@ -887,7 +888,7 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 			HostToNet( relativeDir );
 
 			//set ACK
-			sprintf( socketInfo->buffSend,"250 'CDUP' command successful,'/%s' is current directory.\r\n",relativeDir );
+			sprintf_s( socketInfo->buffSend,"250 'CDUP' command successful,'/%s' is current directory.\r\n",relativeDir );
 
 			//记录处理结果
 			operationResult = DIR_CHANGED;
@@ -896,7 +897,7 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		//send ACK
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD: CDUP"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD: CDUP"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -920,12 +921,12 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		if( strlen(currentDir) < strlen(socketInfo->userRootDir) )
 		{
 			//设置响应消息
-			sprintf( socketInfo->buffSend,"550 'CWD' command failed,'%s' User no power.\r\n",cmdtail );
+			sprintf_s( socketInfo->buffSend,"550 'CWD' command failed,'%s' User no power.\r\n",cmdtail );
 		}		
 		else if( SetCurrentDirectory( currentDir )==0 )  //设置当前目录 \ nonzero is reasonable
 		{
 			//设置响应消息
-			sprintf( socketInfo->buffSend,"550 'CWD' command failed,'%s': No such file or Directory.\r\n",cmdtail );
+			sprintf_s( socketInfo->buffSend,"550 'CWD' command failed,'%s': No such file or Directory.\r\n",cmdtail );
 
 			//记录处理结果
 			operationResult = CANNOT_FIND;
@@ -943,7 +944,7 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 			HostToNet( relativeDir );
 
 			//设置响应消息
-			sprintf( socketInfo->buffSend,"250 'CWD' command successful,'/%s' is current directory.\r\n",relativeDir );
+			sprintf_s( socketInfo->buffSend,"250 'CWD' command successful,'/%s' is current directory.\r\n",relativeDir );
 
 			//记录处理结果
 			operationResult = DIR_CHANGED;
@@ -952,7 +953,7 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		//send ACK
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:CWD"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:CWD"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -978,17 +979,17 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		//根据删除结果，设置响应消息ACK
 		if( operationResult==DIR_CHANGED )
 		{
-			sprintf( socketInfo->buffSend,"250 File '/%s' has been deleted.\r\n",relativeDir );
+			sprintf_s( socketInfo->buffSend,"250 File '/%s' has been deleted.\r\n",relativeDir );
 		}
 		else if( operationResult==ACCESS_DENY )
 		{
-			sprintf( socketInfo->buffSend,"450 File '/%s' can't be deleted.\r\n",relativeDir );
+			sprintf_s( socketInfo->buffSend,"450 File '/%s' can't be deleted.\r\n",relativeDir );
 		}
 
 		//send ACK
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:DELE"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:DELE"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 		return operationResult;
@@ -1003,10 +1004,10 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 		}
 
 		//ACK
-		sprintf(socketInfo->buffSend,"200 Type set to %s.\r\n",cmdtail );
+		sprintf_s(socketInfo->buffSend,"200 Type set to %s.\r\n",cmdtail );
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:TYPE"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:TYPE"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -1016,10 +1017,10 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 	//Restart命令：标志文件内的数据点，将从这个点开始继续传送文件
 	if( strstr( command,"REST" ) )
 	{
-		sprintf( socketInfo->buffSend,"504 Reply marker must be 0.\r\n");
+		sprintf_s( socketInfo->buffSend,"504 Reply marker must be 0.\r\n");
 		if( SendACK( socketInfo ) == -1 )
 		{
-			AfxMessageBox( _T("SendACK() failed.CMD:REST"),MB_OK|MB_ICONERROR );
+			//AfxMessageBox( _T("SendACK() failed.CMD:REST"),MB_OK|MB_ICONERROR );
 			return -1;
 		}
 
@@ -1027,10 +1028,10 @@ int CServer::DealWithCommand( LPSOCKET_INF socketInfo )
 	}
 
 	//其余都是无效的命令
-	sprintf(socketInfo->buffSend,"500 '%s' Unknown command.\r\n",command );
+	sprintf_s(socketInfo->buffSend,"500 '%s' Unknown command.\r\n",command );
 	if( SendACK( socketInfo ) == -1 )
 	{
-		AfxMessageBox( _T("SendACK() failed.CMD:otherwise"),MB_OK|MB_ICONERROR );
+		//AfxMessageBox( _T("SendACK() failed.CMD:otherwise"),MB_OK|MB_ICONERROR );
 		return -1;
 	}
 
@@ -1110,7 +1111,7 @@ int CServer::ConvertDotAddrToCommaAddr(char *dotAddr, WORD wPort, char* commaAdd
 {
 	//处理端口
 	char szPort[10];
-	sprintf( szPort,"%d,%d",wPort/256,wPort%256 );
+	sprintf_s( szPort,"%d,%d",wPort/256,wPort%256 );
 
 	//处理标准Internet IP
 	sprintf( commaAddr,"%s,",dotAddr );
@@ -1141,8 +1142,8 @@ int CServer::DataConnect(SOCKET &s, DWORD dwIp, WORD wPort, int nMode)
 	s = socket( AF_INET,SOCK_STREAM,0 );
 	if( s == INVALID_SOCKET )
 	{
-		sprintf( errorMsg,"socket() failed to get a socket with error: %d.POS:CServer::DataConnect()\n", WSAGetLastError() );
-		 AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
+		sprintf_s( errorMsg,"socket() failed to get a socket with error: %d.POS:CServer::DataConnect()\n", WSAGetLastError() );
+		 //AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
 		 return -1;
 	}
 
@@ -1171,8 +1172,8 @@ int CServer::DataConnect(SOCKET &s, DWORD dwIp, WORD wPort, int nMode)
 		//关闭socket
 		closesocket(s);
 
-		sprintf( errorMsg,"setsockopt() failed to setsockopt with error: %d.POS:CServer::DataConnect()\n",WSAGetLastError() );
-		AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
+		sprintf_s( errorMsg,"setsockopt() failed to setsockopt with error: %d.POS:CServer::DataConnect()\n",WSAGetLastError() );
+		//AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
 
 		return -1;
 	}
@@ -1183,8 +1184,8 @@ int CServer::DataConnect(SOCKET &s, DWORD dwIp, WORD wPort, int nMode)
 		//关闭socket
 		closesocket(s);
 
-		sprintf( errorMsg,"bind() failed with error: %d.\n",WSAGetLastError() );
-		AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
+		sprintf_s( errorMsg,"bind() failed with error: %d.\n",WSAGetLastError() );
+		//AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
 
 		return -1;
 	}
@@ -1198,8 +1199,8 @@ int CServer::DataConnect(SOCKET &s, DWORD dwIp, WORD wPort, int nMode)
 			//关闭socket
 			closesocket(s);
 
-			sprintf(errorMsg,"listen() failed with error: %d.\n",WSAGetLastError() );
-			AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
+			sprintf_s(errorMsg,"listen() failed with error: %d.\n",WSAGetLastError() );
+			//AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
 
 			return -1;
 		}
@@ -1218,8 +1219,8 @@ int CServer::DataConnect(SOCKET &s, DWORD dwIp, WORD wPort, int nMode)
 			//关闭socket
 			closesocket(s);
 
-			sprintf(errorMsg,"connect() failed with error: %d\n",WSAGetLastError() );
-			AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
+			sprintf_s(errorMsg,"connect() failed with error: %d\n",WSAGetLastError() );
+			//AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
 
 			return -1;
 		}
@@ -1241,8 +1242,8 @@ char* CServer::GetLocalAddress()
 	//获取主机名称
 	if( gethostname( hostname,sizeof(hostname) ) == SOCKET_ERROR )
 	{
-		sprintf( errorMsg,"gethostname() failed with error: %d.POS:CServer::GetLocalAddress()",WSAGetLastError() );
-		AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
+		sprintf_s( errorMsg,"gethostname() failed with error: %d.POS:CServer::GetLocalAddress()",WSAGetLastError() );
+		//AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
 
 		return NULL;
 	}
@@ -1252,8 +1253,8 @@ char* CServer::GetLocalAddress()
 	lpHostEnt = gethostbyname( hostname );
     if ( lpHostEnt == NULL )
 	{
-		sprintf( errorMsg,"gethostbyname() failed with error: %d.POS:CServer::GetLocalAddress()",WSAGetLastError() );
-		AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
+		sprintf_s( errorMsg,"gethostbyname() failed with error: %d.POS:CServer::GetLocalAddress()",WSAGetLastError() );
+		//AfxMessageBox( errorMsg, MB_OK|MB_ICONSTOP );
 		return NULL;						
 	}										
 
@@ -1278,7 +1279,7 @@ SOCKET CServer::AcceptConnectRequest(SOCKET &s)
 	SOCKET sDialog = accept( s ,NULL,NULL );
 	if( sDialog == INVALID_SOCKET ) 
 	{
-		AfxMessageBox( _T("accept() failed.POS:CServer::AcceptConnectRequest()"),MB_OK|MB_ICONERROR );
+		//AfxMessageBox( _T("accept() failed.POS:CServer::AcceptConnectRequest()"),MB_OK|MB_ICONERROR );
 		return NULL;
 	}
 
@@ -1323,8 +1324,8 @@ int CServer::FileListToString(char *buffer, UINT nBufferSize, BOOL isListCommand
 			if( FileTimeToSystemTime( &(fileInfo[i].ftLastWriteTime), &systemTime)==0 )
 			{
 				char errorMsg[128];
-				sprintf( errorMsg,"POS:CServer::FileListToString()\nFailed eo convert filetime to systemtime with error: %d.",GetLastError());
-				AfxMessageBox( errorMsg,MB_OK|MB_ICONERROR );
+				sprintf_s( errorMsg,"POS:CServer::FileListToString()\nFailed eo convert filetime to systemtime with error: %d.",GetLastError());
+				//AfxMessageBox( errorMsg,MB_OK|MB_ICONERROR );
 			}
 
 			//配置fileString中文件时间格式中的AM、PM
@@ -1349,7 +1350,7 @@ int CServer::FileListToString(char *buffer, UINT nBufferSize, BOOL isListCommand
 
 			//配置时间格式
 			ZeroMemory( tempTimeFormat,sizeof(tempTimeFormat) );
-			sprintf( tempTimeFormat,"%02u-%02u-%02u  %02u:%02u%s   ",
+			sprintf_s( tempTimeFormat,"%02u-%02u-%02u  %02u:%02u%s   ",
 						systemTime.wMonth,systemTime.wDay,systemTime.wYear,systemTime.wHour,systemTime.wMonth,timeBlock );
 
 			//把当前文件时间保存至buffer数组中
@@ -1366,7 +1367,7 @@ int CServer::FileListToString(char *buffer, UINT nBufferSize, BOOL isListCommand
 				strcat( buffer,"     " );
 
 				// 文件大小
-				sprintf( tempTimeFormat,"%9d Bytes  ",fileInfo[i].nFileSizeLow );
+				sprintf_s( tempTimeFormat,"%9d Bytes  ",fileInfo[i].nFileSizeLow );
 			}
 
 			// 文件名
@@ -1465,8 +1466,8 @@ int CServer::DataSend(SOCKET s, char *buff, int buffSize)
 		{
 			closesocket( s );
 
-			sprintf( errorMsg,"send() failed to send with error: %d.POS:CServer::DataSend()\n",WSAGetLastError() );
-			AfxMessageBox( errorMsg,MB_OK|MB_ICONERROR );
+			sprintf_s( errorMsg,"send() failed to send with error: %d.POS:CServer::DataSend()\n",WSAGetLastError() );
+			//AfxMessageBox( errorMsg,MB_OK|MB_ICONERROR );
 
 			return -1;
 		}
@@ -1529,7 +1530,7 @@ int CServer::ReadFileToBuffer(const char *szFileName, char *buff, int fileSize)
 							   NULL );
 	if( hFile == INVALID_HANDLE_VALUE )
 	{
-		AfxMessageBox( _T("Filed in CreateFile(),POS:CServer::ReadFileToBuffer()") );
+		//AfxMessageBox( _T("Filed in CreateFile(),POS:CServer::ReadFileToBuffer()") );
 	}
 	else
 	{
@@ -1539,7 +1540,7 @@ int CServer::ReadFileToBuffer(const char *szFileName, char *buff, int fileSize)
 			{
 				//关闭句柄
 				CloseHandle( hFile );
-				AfxMessageBox( _T("Filed in ReadFile(),POS:CServer::ReadFileToBuffer()") );
+				//AfxMessageBox( _T("Filed in ReadFile(),POS:CServer::ReadFileToBuffer()") );
 
 				return 0;
 			}
@@ -1581,7 +1582,7 @@ int CServer::DataRecv(SOCKET s, const char *fileName)
 							   NULL );
 	if( hFile == INVALID_HANDLE_VALUE ) 
 	{ 
-		AfxMessageBox( _T("CreateFile() failed.POS:CServer::DataRecv()") );
+		//AfxMessageBox( _T("CreateFile() failed.POS:CServer::DataRecv()") );
 		return -1;
 	}
 	
@@ -1598,7 +1599,7 @@ int CServer::DataRecv(SOCKET s, const char *fileName)
 			nBytesRecv = recv( s,&buff[index],buffBytes,0 );
 			if( nBytesRecv == SOCKET_ERROR ) 
 			{
-				AfxMessageBox( _T("Failed in recv().POS:CServer::DataRecv()") );
+				//AfxMessageBox( _T("Failed in recv().POS:CServer::DataRecv()") );
 				return -1;
 			}
 
@@ -1633,7 +1634,7 @@ int CServer::DataRecv(SOCKET s, const char *fileName)
 			if( !WriteFile( hFile,&buff[index],buffBytes,&bytesWritten,NULL ) ) 
 			{
 				CloseHandle( hFile );
-				AfxMessageBox( _T("写入文件出错.") );
+				//AfxMessageBox( _T("写入文件出错.") );
 				return 0;
 			}
 
